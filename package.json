@@ -1,0 +1,22 @@
+{
+  "name": "renamer",
+  "version": "1.0.0",
+  "description": "renaming music in style ;3",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elenarawrz/renamer.git"
+  },
+  "author": "Elena Valle",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/elenarawrz/renamer/issues"
+  },
+  "homepage": "https://github.com/elenarawrz/renamer#readme",
+  "dependencies": {
+    "ffmetadata": "^1.4.0"
+  }
+}
