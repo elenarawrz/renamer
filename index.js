@@ -105,6 +105,7 @@ function needsToUpdateMD(meta) {
 function needsToUpdateFN(meta, filename) {
   let actualName = filename.replace(getExtension(filename), '');
   let desiredName = `${meta.artist} - ${meta.title}`;
+  desiredName = desiredName.replace(/[^\w- \.,'\(\)\[\]]/g, '-');
 
   if (actualName !== desiredName) {
     return desiredName;
