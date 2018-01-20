@@ -14,9 +14,9 @@ files.filter(f => f.match(/.+/i))
       }
     });
 
-function updateMetadata(meta, file) {
+function updateMetadata(meta, path) {
   if (needsToUpdateMD(meta)) {
-    console.log('updating metadata - ', file);
+    console.log('updating metadata - ', path);
     meta.title = setFirstUpperCase(meta.title);
     meta.album = setFirstUpperCase(meta.album);
     meta.comment = { text: '' };
@@ -24,10 +24,10 @@ function updateMetadata(meta, file) {
     // console.log(meta);
     // console.log('---------------------');
 
-    let success = md.update(meta, file);
-    console.log(success ? 'updated' : 'error', '-', file);
+    let success = md.update(meta, path);
+    console.log(success ? 'updated' : 'error', '-', path);
   } else {
-    console.log('metadata up to date - ', file);
+    console.log('metadata up to date - ', path);
   }
 }
 
