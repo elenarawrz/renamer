@@ -1,9 +1,60 @@
 const fs = require('fs');
-var md = require("ffmetadata");
+const md = require('node-id3');
 
-const testFolder = '../2002 Songs About Jane';
+const dir = 'C:/Users/Elena/Downloads/2002 Songs About Jane/';
 
-var files = fs.readdirSync(testFolder);
-files.forEach(function(file) {
-  console.log(file);
-});
+var files = fs.readdirSync(dir);
+files.filter(f => f.match(/.+/i))
+    .forEach(file => {
+      let path = dir + file;
+      let meta = md.read(path);
+      if (meta) {
+        updateMetadata(meta, path);
+        // updateFilename(meta, path);
+      }
+    });
+
+function updateMetadata(meta, file) {
+  if (needsToUpdateMD(meta)) {
+    console.log('updating metadata - ', file);
+    meta.title = setFirstUpperCase(meta.title);
+    meta.album = setFirstUpperCase(meta.album);
+    meta.comment = { text: '' };
+    meta.performerInfo = '';
+    // console.log(meta);
+    // console.log('---------------------');
+
+    let success = md.update(meta, file);
+    console.log(success ? 'updated' : 'error', '-', file);
+  } else {
+    console.log('metadata up to date - ', file);
+  }
+}
+
+// function updateFilename(meta, file) {
+//   if (needsToUpdateFN(meta, file)) {
+//     fs.existsSync(path)
+//   }
+// }
+
+function needsToUpdateMD(meta) {
+return !!(!isFirstUpperCase(meta.title) ||
+     !isFirstUpperCase(meta.album) ||
+     (meta.comment && meta.comment.text) ||
+     meta.performerInfo);
+}
+
+// function needsToUpdateFN(meta, file) {
+// let actualName = file.substring(0, file.lastIndexOf('.'));
+// let desiredName = `${meta.artist} - ${meta.title}`;
+// console.log('       ', actualName, '---', desiredName);
+// return actualName !== desiredName;
+// }
+
+function setFirstUpperCase(str) {
+  return str ? str.charAt(0) + str.slice(1).toLowerCase() : '';
+}
+
+function isFirstUpperCase(str) {
+  return /^[A-Z][^A-Z]*$/.test(str);
+}

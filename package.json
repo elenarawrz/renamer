@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/elenarawrz/renamer#readme",
   "dependencies": {
-    "ffmetadata": "^1.4.0"
+    "node-id3": "^0.1.0"
   }
 }
