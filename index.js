@@ -47,10 +47,12 @@ function updateFilename(meta, dir, filename) {
 }
 
 function needsToUpdateMD(meta) {
-return !!(!isFirstUpperCase(meta.title) ||
-     !isFirstUpperCase(meta.album) ||
-     (meta.comment && meta.comment.text) ||
-     meta.performerInfo);
+  return !!(
+    !isFirstUpperCase(meta.title) ||
+    !isFirstUpperCase(meta.album) ||
+    (meta.comment && meta.comment.text) ||
+    meta.performerInfo
+  );
 }
 
 function needsToUpdateFN(meta, filename) {
