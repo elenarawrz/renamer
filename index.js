@@ -1,22 +1,39 @@
 const fs = require('fs');
 const md = require('node-id3');
 
-const dir = 'C:/Users/Elena/Downloads/2002 Songs About Jane/';
-const extensions = /.+\.mp3/i;
+const Dir = 'C:/Users/Elena/Downloads/!musica';
+const extensions = /.+\.mp3$/i;
 
-rename();
+start(Dir)
 
-function rename() {
-  var files = fs.readdirSync(dir);
-  files.filter(f => f.match(extensions))
-    .forEach(filename => {
-      let path = dir + filename;
+function start(baseDir) {
+  console.log('     ', baseDir);
+  let files = fs.readdirSync(baseDir);
+  files.forEach(file => {
+    let fullPath = `${baseDir}/${file}`;
+    let isDir = fs.statSync(fullPath).isDirectory();
+
+    if (isDir) {
+      start(fullPath);
+    } else {
+      rename(baseDir, file);
+    }
+  });
+}
+
+function rename(dir, filename) {
+  if (extensions.test(filename)) {
+    let path = `${dir}/${filename}`;
+    try {
       let meta = md.read(path);
       if (meta) {
         updateMetadata(meta, path);
         updateFilename(meta, dir, filename);
       }
-    });
+    } catch (e) {
+      console.log('ERROR could not read metadata - ', path, e);
+    }
+  }
 }
 
 function updateMetadata(meta, path) {
@@ -27,26 +44,30 @@ function updateMetadata(meta, path) {
     meta.performerInfo = '';
 
     let success = md.update(meta, path);
-    console.log('metadata', success ? 'updated' : 'error', '-', path);
+    console.log('metadata', success ? 'updated' : 'ERROR', '-', path);
   } else {
     console.log('metadata up to date - ', path);
   }
 }
 
 function updateFilename(meta, dir, filename) {
-  let oldName = dir + filename;
+  let oldName = `${dir}/${filename}`;
   let newName = needsToUpdateFN(meta, filename);
   if (newName) {
-    newName = dir + newName + getExtension(filename);
+    newName = `${dir}/${newName}${getExtension(filename)}`;
     if (!fs.existsSync(newName)) {
       fs.rename(oldName, newName, err => {
-        console.log('filename', err ? `error - ${oldName}` : `updated - ${newName}`);
+        if (err) {
+          console.log(`filename ERROR - ${oldName}`, err);
+        } else {
+          console.log(`filename updated - ${newName}`);
+        }
       });
     } else {
       console.log('name already exists, could not update! - ', newName);
     }
   } else {
-    console.log('filename up to date - ', dir + filename);
+    console.log('filename up to date - ', oldName);
   }
 }
 
