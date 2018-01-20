@@ -4,8 +4,11 @@ const md = require('node-id3');
 const dir = 'C:/Users/Elena/Downloads/2002 Songs About Jane/';
 const extensions = /.+\.mp3/i;
 
-var files = fs.readdirSync(dir);
-files.filter(f => f.match(extensions))
+rename();
+
+function rename() {
+  var files = fs.readdirSync(dir);
+  files.filter(f => f.match(extensions))
     .forEach(filename => {
       let path = dir + filename;
       let meta = md.read(path);
@@ -14,6 +17,7 @@ files.filter(f => f.match(extensions))
         updateFilename(meta, dir, filename);
       }
     });
+}
 
 function updateMetadata(meta, path) {
   if (needsToUpdateMD(meta)) {
