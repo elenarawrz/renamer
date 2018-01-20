@@ -11,7 +11,7 @@ start(Dir);
 
 function setupLogger() {
   let date = new Date();
-  date = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}.${date.getMinutes()}`
+  date = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}.${date.getMinutes()}`;
   const output = fs.createWriteStream(`./${date}.log`);
   const errorOutput = fs.createWriteStream(`./${date} err.log`);
   return new Console(output, errorOutput);
@@ -43,7 +43,7 @@ function rename(dir, filename) {
       }
     } catch (err) {
       logger.error(`ERROR could not read metadata - ${path}`);
-      logger.error('  ', err);
+      logger.error(err);
       logger.error('----------------------');
     }
   }
@@ -61,7 +61,7 @@ function updateMetadata(meta, path) {
       logger.log(`metadata updated - ${path}`);
     } else {
       logger.error(`metadata ERROR - ${path}`);
-      logger.error('  ', success);
+      logger.error(success);
       logger.error('----------------------');
     }
   } else {
@@ -78,7 +78,7 @@ function updateFilename(meta, dir, filename) {
       fs.rename(oldName, newName, err => {
         if (err) {
           logger.error(`filename ERROR - ${oldName}`);
-          logger.error('  ', err);
+          logger.error(err);
           logger.error('----------------------');
         } else {
           logger.log(`filename updated - ${newName}`);
