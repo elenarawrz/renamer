@@ -2,7 +2,7 @@ const { Console } = require('console');
 const fs = require('fs');
 const md = require('node-id3');
 
-const Dir = 'C:/Users/Elena/Downloads/!musica/Nirvana/Nirvana - [1994-1998] Outcesticide/3 - The final solution';
+const Dir = 'C:/Users/Elena/Downloads/!musica/Garbage';
 const extensions = /.+\.mp3$/i;
 
 const logger = setupLogger();
@@ -55,6 +55,8 @@ function updateMetadata(meta, path) {
     meta.album = setFirstUpperCase(meta.album);
     meta.comment = { text: '' };
     meta.performerInfo = '';
+    meta.trackNumber = cleanTrackNumber(meta.trackNumber);
+    meta.partOfSet = '';
 
     let success = md.update(meta, path);
     if (success) {
@@ -98,7 +100,9 @@ function needsToUpdateMD(meta) {
     !isFirstUpperCase(meta.title) ||
     !isFirstUpperCase(meta.album) ||
     (meta.comment && meta.comment.text) ||
-    meta.performerInfo
+    meta.performerInfo ||
+    meta.trackNumber.indexOf('/') !== -1 ||
+    meta.partOfSet
   );
 }
 
@@ -122,4 +126,11 @@ function isFirstUpperCase(str) {
 
 function getExtension(filename) {
   return filename.substring(filename.lastIndexOf('.'));
+}
+
+function cleanTrackNumber(trackNumber) {
+  if (trackNumber) {
+    let slashIndex = trackNumber.indexOf('/');
+    return slashIndex == -1 ? trackNumber : trackNumber.substring(0, slashIndex)
+  }
 }
