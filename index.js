@@ -62,11 +62,12 @@ function updateMetadata(meta, path) {
     meta.performerInfo = '';
     meta.trackNumber = cleanTrackNumber(meta.trackNumber);
     meta.partOfSet = '';
+    meta.encodedBy = '';
     // console.log(meta);
 
     let success = md.update(meta, path);
     if (success) {
-      logger.log(`metadata updated - ${path}`);
+      logger.log(`***** metadata updated - ${path}`);
       if (hasBrackets(meta.title) || hasBrackets(meta.album)) {
         logger.warn(`HEADS UP! metadata has brackets - ${path}`);
       }
@@ -95,7 +96,7 @@ function updateFilename(meta, dir, filename) {
           logger.error(err);
           logger.error('----------------------');
         } else {
-          logger.log(`filename updated - ${newName}`);
+          logger.log(`***** filename updated - ${newName}`);
         }
       });
     } else {
@@ -114,14 +115,15 @@ function needsToUpdateMD(meta) {
     (meta.comment && meta.comment.text) ||
     meta.performerInfo ||
     (meta.trackNumber && meta.trackNumber.indexOf('/') !== -1) ||
-    meta.partOfSet
+    meta.partOfSet ||
+    meta.encodedBy
   );
 }
 
 function needsToUpdateFN(meta, filename) {
   let actualName = filename.replace(getExtension(filename), '');
   let desiredName = `${meta.artist} - ${meta.title}`;
-  desiredName = desiredName.replace(/[^\w- \.,'\(\)\[\]#$&!]/g, '-');
+  desiredName = desiredName.replace(/[\\/:*?"<>|]/g, '-');
 
   if (actualName !== desiredName) {
     return desiredName;
