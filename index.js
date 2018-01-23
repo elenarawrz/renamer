@@ -2,8 +2,12 @@ const { Console } = require('console');
 const fs = require('fs');
 const md = require('node-id3');
 
-const Dir = 'C:/Users/Elena/Downloads/!musica/Garbage';
+const Dir = 'G:/HD sony/Música/BlackBerry Music';
 const extensions = /.+\.mp3$/i;
+const featArr = [
+  ' feat ', '(feat ', '[feat ', ' feat. ', '(feat. ', '[feat. ',
+  ' ft ', '(ft ', '[ft ', ' ft. ', '(ft. ', '[ft. '
+];
 
 const logger = setupLogger();
 
@@ -12,8 +16,8 @@ start(Dir);
 function setupLogger() {
   let date = new Date();
   date = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}.${date.getMinutes()}`;
-  const output = fs.createWriteStream(`./${date}.log`);
-  const errorOutput = fs.createWriteStream(`./${date} err.log`);
+  const output = fs.createWriteStream(`./logs/${date}.log`);
+  const errorOutput = fs.createWriteStream(`./logs/${date} err.log`);
   return new Console(output, errorOutput);
 }
 
@@ -51,16 +55,24 @@ function rename(dir, filename) {
 
 function updateMetadata(meta, path) {
   if (needsToUpdateMD(meta)) {
+    let hadFeat = checkFeat(meta);
     meta.title = setFirstUpperCase(meta.title);
     meta.album = setFirstUpperCase(meta.album);
     meta.comment = { text: '' };
     meta.performerInfo = '';
     meta.trackNumber = cleanTrackNumber(meta.trackNumber);
     meta.partOfSet = '';
+    // console.log(meta);
 
     let success = md.update(meta, path);
     if (success) {
       logger.log(`metadata updated - ${path}`);
+      if (hasBrackets(meta.title) || hasBrackets(meta.album)) {
+        logger.warn(`HEADS UP! metadata has brackets - ${path}`);
+      }
+      if (hadFeat) {
+        logger.warn(`HEADS UP! title had 'feat' - ${path}`);
+      }
     } else {
       logger.error(`metadata ERROR - ${path}`);
       logger.error(success);
@@ -101,7 +113,7 @@ function needsToUpdateMD(meta) {
     !isFirstUpperCase(meta.album) ||
     (meta.comment && meta.comment.text) ||
     meta.performerInfo ||
-    meta.trackNumber.indexOf('/') !== -1 ||
+    (meta.trackNumber && meta.trackNumber.indexOf('/') !== -1) ||
     meta.partOfSet
   );
 }
@@ -109,7 +121,7 @@ function needsToUpdateMD(meta) {
 function needsToUpdateFN(meta, filename) {
   let actualName = filename.replace(getExtension(filename), '');
   let desiredName = `${meta.artist} - ${meta.title}`;
-  desiredName = desiredName.replace(/[^\w- \.,'\(\)\[\]#]/g, '-');
+  desiredName = desiredName.replace(/[^\w- \.,'\(\)\[\]#$&!]/g, '-');
 
   if (actualName !== desiredName) {
     return desiredName;
@@ -133,4 +145,27 @@ function cleanTrackNumber(trackNumber) {
     let slashIndex = trackNumber.indexOf('/');
     return slashIndex == -1 ? trackNumber : trackNumber.substring(0, slashIndex)
   }
+}
+
+function hasBrackets(str) {
+  return /[\[\]\{\}]/.test(str);
+}
+
+// TODO find a better way to do this!
+function checkFeat(meta) {
+  // if (meta.title.match(/\s/).length >= 2) {
+    let hadFeat = false;
+    featArr.some(function (ft) {
+      let ftIndex = meta.title.indexOf(ft);
+      if (ftIndex > -1) {
+        let feat = meta.title.substring(ftIndex);
+        meta.title = meta.title.replace(feat, '');
+        feat = feat.replace(ft, '').replace(/[\)\]]/, '');
+        meta.artist += ` ft. ${feat}`;
+        hadFeat = true;
+        return true;
+      }
+    });
+    return hadFeat;
+  // }
 }
