@@ -4,8 +4,8 @@ const md = require('node-id3');
 
 const Dir = 'C:/Users/Elena/Downloads/test';
 const extensions = /.+\.mp3$/i;
-var ftBase = 'f(ea)?t\\.? [^\\(\\[]+';
-var ftRegex = new RegExp(`(\\(${ftBase}\\)|\\[${ftBase}\\]| ${ftBase})`);
+const ftBase = 'f(ea)?t\\.? [^\\(\\[]+';
+const ftRegex = new RegExp(`(\\(${ftBase}\\)|\\[${ftBase}\\]| ${ftBase})`);
 
 const logger = setupLogger();
 
@@ -56,6 +56,7 @@ function updateMetadata(meta, path) {
     let hadFeat = checkFeat(meta);
     meta.title = setFirstUpperCase(meta.title);
     meta.album = setFirstUpperCase(meta.album);
+    meta.artist = formatArtist(meta.artist);
     meta.comment = { text: '' };
     meta.performerInfo = '';
     meta.trackNumber = cleanTrackNumber(meta.trackNumber);
@@ -129,11 +130,23 @@ function needsToUpdateFN(meta, filename) {
 }
 
 function setFirstUpperCase(str) {
-  return str ? (str.charAt(0) + str.slice(1).toLowerCase()).trim() : '';
+  return str ? stripSpaces(str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()) : '';
 }
 
 function isFirstUpperCase(str) {
   return /^[A-Z][^A-Z]*$/.test(str);
+}
+
+function stripSpaces(str) {
+  return str.replace(/  +/, ' ').trim();
+}
+
+function formatArtist(artist) {
+  return artist
+    .split(' ')
+    .map(function (name) {
+      return name !== 'ft.' ? setFirstUpperCase(name) : name;
+    }).join(' ');
 }
 
 function getExtension(filename) {
