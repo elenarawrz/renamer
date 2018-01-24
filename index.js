@@ -2,12 +2,8 @@ const { Console } = require('console');
 const fs = require('fs');
 const md = require('node-id3');
 
-const Dir = 'G:/HD sony/Música/BlackBerry Music';
+const Dir = 'C:/Users/Elena/Downloads/test';
 const extensions = /.+\.mp3$/i;
-const featArr = [
-  ' feat ', '(feat ', '[feat ', ' feat. ', '(feat. ', '[feat. ',
-  ' ft ', '(ft ', '[ft ', ' ft. ', '(ft. ', '[ft. '
-];
 
 const logger = setupLogger();
 
@@ -131,7 +127,7 @@ function needsToUpdateFN(meta, filename) {
 }
 
 function setFirstUpperCase(str) {
-  return str ? str.charAt(0) + str.slice(1).toLowerCase() : '';
+  return str ? (str.charAt(0) + str.slice(1).toLowerCase()).trim() : '';
 }
 
 function isFirstUpperCase(str) {
@@ -153,21 +149,16 @@ function hasBrackets(str) {
   return /[\[\]\{\}]/.test(str);
 }
 
-// TODO find a better way to do this!
 function checkFeat(meta) {
-  // if (meta.title.match(/\s/).length >= 2) {
-    let hadFeat = false;
-    featArr.some(function (ft) {
-      let ftIndex = meta.title.indexOf(ft);
-      if (ftIndex > -1) {
-        let feat = meta.title.substring(ftIndex);
-        meta.title = meta.title.replace(feat, '');
-        feat = feat.replace(ft, '').replace(/[\)\]]/, '');
-        meta.artist += ` ft. ${feat}`;
-        hadFeat = true;
-        return true;
-      }
-    });
-    return hadFeat;
-  // }
+  let ft = meta.title.match(/[ \(\[]f(ea)?t\.? .+/);
+  console.log(ft);
+  if (ft && ft.length) {
+    ft = ft[0];
+    meta.title = meta.title.replace(ft, '');
+    ft = ft.substring(ft.indexOf(' ', 1) + 1).replace(/[\)\]]/, '');
+    meta.artist += ` ft. ${ft}`;
+    return true;
+  }
+
+  return false;
 }
