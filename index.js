@@ -4,6 +4,8 @@ const md = require('node-id3');
 
 const Dir = 'C:/Users/Elena/Downloads/test';
 const extensions = /.+\.mp3$/i;
+var ftBase = 'f(ea)?t\\.? [^\\(\\[]+';
+var ftRegex = new RegExp(`(\\(${ftBase}\\)|\\[${ftBase}\\]| ${ftBase})`);
 
 const logger = setupLogger();
 
@@ -150,8 +152,7 @@ function hasBrackets(str) {
 }
 
 function checkFeat(meta) {
-  let ft = meta.title.match(/[ \(\[]f(ea)?t\.? .+/);
-  console.log(ft);
+  let ft = meta.title.match(ftRegex);
   if (ft && ft.length) {
     ft = ft[0];
     meta.title = meta.title.replace(ft, '');
