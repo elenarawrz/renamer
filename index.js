@@ -84,6 +84,8 @@ function updateMetadata(meta, path) {
 }
 
 function updateFilename(meta, dir, filename) {
+  if (!meta.artist && !meta.title) return;
+
   let oldName = `${dir}/${filename}`;
   let newName = needsToUpdateFN(meta, filename);
   if (newName) {
@@ -142,7 +144,7 @@ function stripSpaces(str) {
 }
 
 function formatArtist(artist) {
-  return artist
+  return !artist ? '' : artist
     .split(' ')
     .map(function (name) {
       return name !== 'ft.' ? setFirstUpperCase(name) : name;
@@ -165,13 +167,15 @@ function hasBrackets(str) {
 }
 
 function checkFeat(meta) {
-  let ft = meta.title.match(ftRegex);
-  if (ft && ft.length) {
-    ft = ft[0];
-    meta.title = meta.title.replace(ft, '');
-    ft = ft.substring(ft.indexOf(' ', 1) + 1).replace(/[\)\]]/, '');
-    meta.artist += ` ft. ${ft}`;
-    return true;
+  if (meta.title) {
+    let ft = meta.title.match(ftRegex);
+    if (ft && ft.length) {
+      ft = ft[0];
+      meta.title = meta.title.replace(ft, '');
+      ft = ft.substring(ft.indexOf(' ', 1) + 1).replace(/[\)\]]/, '');
+      meta.artist += ` ft. ${ft}`;
+      return true;
+    }
   }
 
   return false;
