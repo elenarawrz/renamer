@@ -2,7 +2,7 @@ const { Console } = require('console');
 const fs = require('fs');
 const md = require('node-id3');
 
-const Dir = 'C:/Users/Elena/Downloads/test';
+const Dir = 'C:/Users/Elena/Desktop/musica/!!!';
 const extensions = /.+\.mp3$/i;
 const ftBase = 'f(ea)?t\\.? [^\\(\\[]+';
 const ftRegex = new RegExp(`(\\(${ftBase}\\)|\\[${ftBase}\\]| ${ftBase})`);
@@ -41,7 +41,8 @@ function rename(dir, filename) {
       let meta = md.read(path);
       if (meta) {
         updateMetadata(meta, path);
-        updateFilename(meta, dir, filename);
+        // updateFilename(meta, dir, filename);
+        // moveFile(dir, filename);
       }
     } catch (err) {
       logger.error(`ERROR could not read metadata - ${path}`);
@@ -107,6 +108,26 @@ function updateFilename(meta, dir, filename) {
   } else {
     logger.log(`filename up to date - ${oldName}`);
   }
+}
+
+function moveFile(dir, filename) {
+  let oldName = `${dir}/${filename}`;
+  let newDir = dir.replace(Dir, `${Dir}/!DONE`);
+  let newName =  `${newDir}/${filename}`;
+
+  if (!fs.existsSync(newDir)) {
+    fs.mkdirSync(newDir);
+  }
+
+  fs.rename(oldName, newName, err => {
+    if (err) {
+      logger.error(`filename ERROR - ${oldName}`);
+      logger.error(err);
+      logger.error('----------------------');
+    } else {
+      logger.log(`***** file moved - ${newName}`);
+    }
+  });
 }
 
 function needsToUpdateMD(meta) {
