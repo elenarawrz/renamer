@@ -2,9 +2,9 @@ const { Console } = require('console');
 const fs = require('fs');
 const md = require('node-id3');
 
-const Dir = 'C:/Users/Elena/Desktop/musica/!!!';
+const Dir = 'C:/Users/Elena/Downloads/!musica/!/!/!';
 const extensions = /.+\.mp3$/i;
-const ftBase = 'f(ea)?t\\.? [^\\(\\[]+';
+const ftBase = 'f(ea)?t(uring)\\.? [^\\(\\[]+';
 const ftRegex = new RegExp(`(\\(${ftBase}\\)|\\[${ftBase}\\]| ${ftBase})`);
 
 const logger = setupLogger();
@@ -41,7 +41,7 @@ function rename(dir, filename) {
       let meta = md.read(path);
       if (meta) {
         updateMetadata(meta, path);
-        // updateFilename(meta, dir, filename);
+        updateFilename(meta, dir, filename);
         // moveFile(dir, filename);
       }
     } catch (err) {
@@ -145,7 +145,10 @@ function needsToUpdateMD(meta) {
 function needsToUpdateFN(meta, filename) {
   let actualName = filename.replace(getExtension(filename), '');
   let desiredName = `${meta.artist} - ${meta.title}`;
-  desiredName = desiredName.replace(/[\\/:*?"<>|]/g, '-');
+  desiredName = desiredName
+    .replace('?', '')
+    .replace(':', ',')
+    .replace(/[\\/*"<>|]/g, '-');
 
   if (actualName !== desiredName) {
     return desiredName;
